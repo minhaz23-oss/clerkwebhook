@@ -1,23 +1,32 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
-const MONGODB_URI= process.env.MONGODB_URI;
+const MONGODB_URI = process.env.MONGODB_URI;
+
+if (!MONGODB_URI) {
+    throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
+}
 
 let cached = global.mongoose;
 
-if(!cached){
-    cached = global.mongoose = {
-        conn: null,
-        promise: null
-    }
+if (!cached) {
+    cached = global.mongoose = { conn: null, promise: null };
 }
 
 export const dbConnect = async () => {
-    if(cached.conn) return cached.conn;
+    if (cached.conn) {
+        return cached.conn;
+    }
 
-    cached.promise = cached.promise || mongoose.connect(MONGODB_URI,{
-        dbName: 'clerk-webhook',
-        bufferCommands: false
-    })
+    if (!cached.promise) {
+        cached.promise = mongoose.connect(MONGODB_URI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            dbName: 'clerk-webhook',
+        }).then((mongoose) => {
+            return mongoose;
+        });
+    }
+
     cached.conn = await cached.promise;
     return cached.conn;
 }
