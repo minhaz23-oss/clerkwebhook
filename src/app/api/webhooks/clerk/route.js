@@ -60,15 +60,17 @@ export async function POST(req) {
   // Log webhook details
   const { id } = evt.data;
   const eventType = evt.type;
-  // if(eventType === 'user.created'){
-  //   const {email_addresses,username} = evt.data;
-  //   const user = {
-  //       email: email_addresses[0].email_address,
-  //       username: username
-  //   }
-  //   await createUser(user);
-  //   return NextResponse.json({message: 'user created successfully',user})
-  // }
+  const {email_addresses,username} = evt.data;
+  console.log(username,email_addresses)
+  if(eventType === 'user.created'){
+    const {email_addresses,username} = evt.data;
+    const user = {
+        email: email_addresses[0].email_address,
+        username: username
+    }
+    await createUser(user);
+    return NextResponse.json({message: 'user created successfully',user})
+  }
   console.log(`Webhook with an ID of ${id} and type of ${eventType}`);
   console.log('Webhook body:', body);
 
